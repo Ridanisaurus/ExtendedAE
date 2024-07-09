@@ -46,6 +46,7 @@ import com.glodblock.github.extendedae.common.parts.PartTagExportBus;
 import com.glodblock.github.extendedae.common.parts.PartTagStorageBus;
 import com.glodblock.github.extendedae.common.parts.PartThresholdExportBus;
 import com.glodblock.github.extendedae.common.parts.PartThresholdLevelEmitter;
+import com.glodblock.github.extendedae.config.ConfigCondition;
 import com.glodblock.github.extendedae.config.EAEConfig;
 import com.glodblock.github.extendedae.container.ContainerActiveFormationPlane;
 import com.glodblock.github.extendedae.container.ContainerCaner;
@@ -80,6 +81,8 @@ import com.glodblock.github.extendedae.recipe.CircuitCutterRecipe;
 import com.glodblock.github.extendedae.recipe.CircuitCutterRecipeSerializer;
 import com.glodblock.github.extendedae.recipe.CrystalAssemblerRecipe;
 import com.glodblock.github.extendedae.recipe.CrystalAssemblerRecipeSerializer;
+import com.glodblock.github.extendedae.recipe.CrystalFixerRecipe;
+import com.glodblock.github.extendedae.recipe.CrystalFixerRecipeSerializer;
 import com.glodblock.github.extendedae.xmod.ModConstants;
 import com.glodblock.github.extendedae.xmod.appflux.AFCommonLoad;
 import com.glodblock.github.extendedae.xmod.wt.WTCommonLoad;
@@ -97,6 +100,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collection;
@@ -151,10 +155,13 @@ public class EAERegistryHandler extends RegistryHandler {
     }
 
     private void onRegisterRecipe() {
+        Registry.register(NeoForgeRegistries.CONDITION_SERIALIZERS, ExtendedAE.id("config"), ConfigCondition.CODEC);
         Registry.register(BuiltInRegistries.RECIPE_TYPE, CrystalAssemblerRecipe.ID, CrystalAssemblerRecipe.TYPE);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, CrystalAssemblerRecipe.ID, CrystalAssemblerRecipeSerializer.INSTANCE);
         Registry.register(BuiltInRegistries.RECIPE_TYPE, CircuitCutterRecipe.ID, CircuitCutterRecipe.TYPE);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, CircuitCutterRecipe.ID, CircuitCutterRecipeSerializer.INSTANCE);
+        Registry.register(BuiltInRegistries.RECIPE_TYPE, CrystalFixerRecipe.ID, CrystalFixerRecipe.TYPE);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, CrystalFixerRecipe.ID, CrystalFixerRecipeSerializer.INSTANCE);
     }
 
     private void onRegisterContainer() {
@@ -220,9 +227,6 @@ public class EAERegistryHandler extends RegistryHandler {
         this.registerStorageHandler();
         this.registerRandomAPI();
         this.initPackageList();
-        if (GlodUtil.checkMod(ModConstants.AE2WTL)) {
-            WTCommonLoad.init();
-        }
         if (GlodUtil.checkMod(ModConstants.APPFLUX)) {
             AFCommonLoad.init();
         }

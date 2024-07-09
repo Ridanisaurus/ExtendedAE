@@ -95,18 +95,27 @@ repositories {
 dependencies {
     implementation "curse.maven:glodium-957920:5491696"
     implementation "appeng:appliedenergistics2:19.0.8-alpha"
-    //compileOnly "curse.maven:curios-309927:5302407"
-    compileOnly "curse.maven:applied-flux-965012:5497380"
-    compileOnly "curse.maven:applied-energistics-2-wireless-terminals-459929:5466359"
+    compileOnly "curse.maven:applied-energistics-2-wireless-terminals-459929:5503178"
+    compileOnly "curse.maven:applied-flux-965012:5504017"
     compileOnly "dev.emi:emi-neoforge:1.1.7+1.21"
     //compileOnly "curse.maven:mega-cells-622112:5310776"
     compileOnly "curse.maven:jade-324717:5444008"
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.729"
     // runtime test
-    runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"
-    runtimeOnly "curse.maven:applied-flux-965012:5497380"
+    runtimeOnly "curse.maven:applied-flux-965012:5504017"
     //runtimeOnly "curse.maven:mega-cells-622112:5310776"
     runtimeOnly "curse.maven:jade-324717:5444008"
+    // setup Xei
+    switch(use_Xei) {
+        case "emi":
+            runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"
+            break
+        case "rei":
+            runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.729"
+            runtimeOnly "dev.architectury:architectury-neoforge:13.0.1"
+            runtimeOnly "curse.maven:cloth-config-348521:5424576"
+            break
+    }
 }
 
 tasks.withType(ProcessResources).configureEach {

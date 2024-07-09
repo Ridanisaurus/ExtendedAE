@@ -9,11 +9,12 @@ import appeng.recipes.handlers.InscriberRecipeBuilder;
 import appeng.recipes.transform.TransformCircumstance;
 import appeng.recipes.transform.TransformRecipeBuilder;
 import com.glodblock.github.appflux.common.AFSingletons;
-import com.glodblock.github.appflux.util.AFTags;
 import com.glodblock.github.extendedae.ExtendedAE;
 import com.glodblock.github.extendedae.common.EAESingletons;
+import com.glodblock.github.extendedae.config.ConfigCondition;
 import com.glodblock.github.extendedae.recipe.CircuitCutterRecipeBuilder;
 import com.glodblock.github.extendedae.recipe.CrystalAssemblerRecipeBuilder;
+import com.glodblock.github.extendedae.recipe.CrystalFixerRecipeBuilder;
 import com.glodblock.github.extendedae.util.EAETags;
 import com.glodblock.github.extendedae.xmod.ModConstants;
 import com.glodblock.github.glodium.util.GlodUtil;
@@ -410,7 +411,7 @@ public class EAERecipeProvider extends RecipeProvider {
 
         // Entro Seed
         ShapelessRecipeBuilder
-                .shapeless(RecipeCategory.MISC, EAESingletons.ENTRO_SEED)
+                .shapeless(RecipeCategory.MISC, EAESingletons.ENTRO_SEED, 2)
                 .requires(Tags.Items.SANDS)
                 .requires(ConventionTags.ENDER_PEARL_DUST)
                 .requires(ConventionTags.ENDER_PEARL_DUST)
@@ -543,7 +544,7 @@ public class EAERecipeProvider extends RecipeProvider {
                 .save(c, ExtendedAE.id("silicon_block"));
         ShapelessRecipeBuilder
                 .shapeless(RecipeCategory.MISC, AEItems.SILICON, 9)
-                .requires(EAETags.SILICON_BLOCK)
+                .requires(EAESingletons.SILICON_BLOCK)
                 .unlockedBy(C, has(EAETags.SILICON_BLOCK))
                 .save(c, ExtendedAE.id("silicon_decompress"));
 
@@ -580,8 +581,20 @@ public class EAERecipeProvider extends RecipeProvider {
                 .unlockedBy(C, has(EAESingletons.OVERSIZE_INTERFACE_PART))
                 .save(c, ExtendedAE.id("oversize_interface_alt"));
 
+        // Entro Shard
+        ShapedRecipeBuilder
+                .shaped(RecipeCategory.MISC, EAESingletons.ENTRO_CRYSTAL)
+                .pattern("SSS")
+                .pattern("S S")
+                .pattern("SSS")
+                .define('S', EAESingletons.ENTRO_SHARD)
+                .unlockedBy(C, has(EAESingletons.ENTRO_SHARD))
+                .save(c, ExtendedAE.id("entro_recycle"));
+
         transformation(c);
         circuit(c);
+        assemblerCircuit(c);
+        fixer(c);
 
         if (GlodUtil.checkMod(ModConstants.MEGA)) {
             maga(c);
@@ -601,6 +614,14 @@ public class EAERecipeProvider extends RecipeProvider {
                 .input(ConventionTags.NETHER_QUARTZ, 4)
                 .fluid(Fluids.WATER, 100)
                 .save(c, ExtendedAE.id("assembler/fluix_transformation"));
+        // Entro Infused Ingot
+        CrystalAssemblerRecipeBuilder
+                .assemble(EAESingletons.ENTRO_INGOT, 4)
+                .input(EAETags.ENTRO_DUST, 4)
+                .input(ConventionTags.GOLD_INGOT, 4)
+                .input(Items.LAPIS_LAZULI, 4)
+                .fluid(Fluids.WATER, 100)
+                .save(c, ExtendedAE.id("assembler/entro_ingot_transformation"));
     }
 
     private void circuit(@NotNull RecipeOutput c) {
@@ -662,6 +683,62 @@ public class EAERecipeProvider extends RecipeProvider {
                 .cut(MEGAItems.ACCUMULATION_PROCESSOR_PRINT, 9)
                 .input(MEGATags.SKY_STEEL_BLOCK_ITEM)
                 .save(c.withConditions(mod(ModConstants.MEGA)), ExtendedAE.id("cutter/accumulation_processor"));*/
+    }
+
+    private void assemblerCircuit(@NotNull RecipeOutput c) {
+        var cond = new ConfigCondition(ConfigCondition.IDs.ASSEMBLER_CIRCUIT);
+        CrystalAssemblerRecipeBuilder
+                .assemble(AEItems.CALCULATION_PROCESSOR, 4)
+                .input(AEItems.CALCULATION_PROCESSOR_PRINT, 4)
+                .input(AEItems.SILICON_PRINT, 4)
+                .input(ConventionTags.REDSTONE, 4)
+                .save(c.withConditions(cond), ExtendedAE.id("assembler/calculation_processor"));
+        CrystalAssemblerRecipeBuilder
+                .assemble(AEItems.ENGINEERING_PROCESSOR, 4)
+                .input(AEItems.ENGINEERING_PROCESSOR_PRINT, 4)
+                .input(AEItems.SILICON_PRINT, 4)
+                .input(ConventionTags.REDSTONE, 4)
+                .save(c.withConditions(cond), ExtendedAE.id("assembler/engineering_processor"));
+        CrystalAssemblerRecipeBuilder
+                .assemble(AEItems.LOGIC_PROCESSOR, 4)
+                .input(AEItems.LOGIC_PROCESSOR_PRINT, 4)
+                .input(AEItems.SILICON_PRINT, 4)
+                .input(ConventionTags.REDSTONE, 4)
+                .save(c.withConditions(cond), ExtendedAE.id("assembler/logic_processor"));
+        CrystalAssemblerRecipeBuilder
+                .assemble(EAESingletons.CONCURRENT_PROCESSOR, 4)
+                .input(EAESingletons.CONCURRENT_PROCESSOR_PRINT, 4)
+                .input(AEItems.SILICON_PRINT, 4)
+                .input(ConventionTags.REDSTONE, 4)
+                .save(c.withConditions(cond), ExtendedAE.id("assembler/concurrent_processor"));
+    }
+
+    private void fixer(@NotNull RecipeOutput c) {
+        CrystalFixerRecipeBuilder
+                .fixer(AEBlocks.DAMAGED_BUDDING_QUARTZ.block(), AEBlocks.CHIPPED_BUDDING_QUARTZ.block())
+                .fuel(AEItems.CERTUS_QUARTZ_CRYSTAL_CHARGED)
+                .chance(0.8)
+                .save(c, ExtendedAE.id("fixer/certus_damage"));
+        CrystalFixerRecipeBuilder
+                .fixer(AEBlocks.CHIPPED_BUDDING_QUARTZ.block(), AEBlocks.FLAWED_BUDDING_QUARTZ.block())
+                .fuel(AEItems.CERTUS_QUARTZ_CRYSTAL_CHARGED)
+                .chance(0.8)
+                .save(c, ExtendedAE.id("fixer/certus_chipped"));
+        CrystalFixerRecipeBuilder
+                .fixer(EAESingletons.HARDLY_ENTROIZED_FLUIX_BUDDING, EAESingletons.HALF_ENTROIZED_FLUIX_BUDDING)
+                .fuel(ConventionTags.ENDER_PEARL_DUST)
+                .chance(0.2)
+                .save(c, ExtendedAE.id("fixer/entro_hardly"));
+        CrystalFixerRecipeBuilder
+                .fixer(EAESingletons.HALF_ENTROIZED_FLUIX_BUDDING, EAESingletons.MOSTLY_ENTROIZED_FLUIX_BUDDING)
+                .fuel(ConventionTags.ENDER_PEARL_DUST)
+                .chance(0.2)
+                .save(c, ExtendedAE.id("fixer/entro_half"));
+        CrystalFixerRecipeBuilder
+                .fixer(EAESingletons.MOSTLY_ENTROIZED_FLUIX_BUDDING, EAESingletons.FULLY_ENTROIZED_FLUIX_BUDDING)
+                .fuel(ConventionTags.ENDER_PEARL_DUST)
+                .chance(0.2)
+                .save(c, ExtendedAE.id("fixer/entro_mostly"));
     }
 
     private ICondition mod(String modid) {
